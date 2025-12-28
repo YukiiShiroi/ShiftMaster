@@ -1,0 +1,5 @@
+{
+  "name": "ShiftMaster - Procedural Calendar",
+  "description": "A deterministic work calendar system with fixed rotating shifts, multiple views, and AI-powered schedule analysis.",
+  "requestFramePermissions": []
+}
