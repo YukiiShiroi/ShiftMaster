@@ -1,13 +1,11 @@
-import { GoogleGenAI } from "@google/genai";
+
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { Overrides, Holidays } from "../types";
 import { getPseudocode } from "../utils/scheduler";
 
-const getClient = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("API Key not found");
-  return new GoogleGenAI({ apiKey });
-};
-
+/**
+ * Analyzes the schedule based on user queries using Gemini API.
+ */
 export const analyzeSchedule = async (
   // shift is removed as it's now deterministic
   currentDate: Date,
@@ -16,7 +14,8 @@ export const analyzeSchedule = async (
   holidays: Holidays
 ): Promise<string> => {
   try {
-    const ai = getClient();
+    // Fix: Always use process.env.API_KEY directly when initializing the GoogleGenAI instance as per guidelines
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const model = "gemini-3-flash-preview";
     
     const dateStr = currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -53,11 +52,13 @@ export const analyzeSchedule = async (
       Keep the response concise, helpful, and friendly.
     `;
 
-    const response = await ai.models.generateContent({
+    // Fix: Explicitly type the response and call generateContent directly on ai.models
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model,
       contents: prompt,
     });
 
+    // Fix: Access .text as a property, not a method, as per SDK guidelines
     return response.text || "I couldn't generate a response at this time.";
   } catch (error) {
     console.error("Gemini API Error:", error);
